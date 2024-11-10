@@ -1,5 +1,4 @@
 import csv
-from collections import defaultdict
 
 
 def load_sequences_from_csv(file_path):
