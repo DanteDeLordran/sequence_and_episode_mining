@@ -1,59 +1,68 @@
-import pandas as pd
-import itertools
-from tkinter import filedialog
+import csv
+from collections import defaultdict
 
-# Load the CSV data into a pandas dataframe
-data = pd.read_csv( filedialog.askopenfilename(), header=None, names=["Items"], sep=None, engine='python', dtype=str)
 
-# Preprocess the data: convert each row of items to a list
-transactions = data['Items'].str.split(',')
+def load_sequences_from_csv(file_path):
+    sequences = []
+    with open(file_path, 'r') as file:
+        reader = csv.reader(file)
+        for row in reader:
+            sequences.append(row)
+    return sequences
 
-# Function to generate candidate itemsets of a given size
-def generate_candidates(itemsets, size):
+
+def generate_candidates(prev_patterns, length):
     candidates = []
-    for itemset1 in itemsets:
-        for itemset2 in itemsets:
-            candidate = set(itemset1).union(set(itemset2))
-            if len(candidate) == size:
-                candidates.append(frozenset(candidate))
+    for i in range(len(prev_patterns)):
+        for j in range(len(prev_patterns)):
+
+            if prev_patterns[i][1:] == prev_patterns[j][:-1]:
+                candidates.append(prev_patterns[i] + [prev_patterns[j][-1]])
     return candidates
 
-# Function to calculate support count of an itemset in the transactions
-def support_count(itemset, transactions):
-    return sum(1 for transaction in transactions if itemset.issubset(transaction))
 
-# Apriori Algorithm Implementation
-def apriori(transactions, min_support):
-    itemsets = [frozenset([item]) for transaction in transactions for item in transaction]
-    itemsets = list(set(itemsets))  # Remove duplicates
+def count_support(sequences, pattern):
+    count = 0
+    for sequence in sequences:
+        seq_index = 0
+        for item in pattern:
 
-    frequent_itemsets = []
-    candidate_itemsets = itemsets
-    k = 1
+            if item in sequence[seq_index:]:
+                seq_index = sequence.index(item, seq_index) + 1
+            else:
+                break
+        else:
+            count += 1
+    return count
 
-    while candidate_itemsets:
-        # Calculate support count for each candidate itemset
-        itemset_support = {itemset: support_count(itemset, transactions) for itemset in candidate_itemsets}
 
-        # Filter itemsets that meet the minimum support
-        frequent_itemsets_k = {itemset: support for itemset, support in itemset_support.items() if support >= min_support}
+def apriori_sequence_mining(sequences, minsup):
+    patterns = []
 
-        # Add frequent itemsets of size k to the final list
-        frequent_itemsets.extend(frequent_itemsets_k.items())
+    single_items = {item for sequence in sequences for item in sequence}
+    current_patterns = [[item] for item in single_items]
 
-        # Generate candidate itemsets for next size k+1
-        candidate_itemsets = generate_candidates(list(frequent_itemsets_k.keys()), k + 1)
-        k += 1
+    while current_patterns:
 
-    return frequent_itemsets
+        next_patterns = []
+        for pattern in current_patterns:
+            support = count_support(sequences, pattern)
+            if support / len(sequences) >= minsup:
+                patterns.append(pattern)
+                next_patterns.append(pattern)
 
-# Minimum support threshold (example: 2 transactions)
-min_support = 2
+        current_patterns = generate_candidates(next_patterns, len(next_patterns[0]) + 1) if next_patterns else []
 
-# Apply Apriori Algorithm
-frequent_itemsets = apriori(transactions, min_support)
+    return patterns
 
-# Display the frequent itemsets with their counts
-print("Frequent Itemsets with Counts:")
-for itemset, count in frequent_itemsets:
-    print(f"Itemset: {itemset}, Count: {count}")
+
+def run():
+    file_path = '../sample_two.csv'
+    minsup = 0.1
+    sequences = load_sequences_from_csv(file_path)
+    frequent_patterns = apriori_sequence_mining(sequences, minsup)
+    print("Frequent sequential patterns:", frequent_patterns)
+
+
+if __name__ == '__main__':
+    run()
