@@ -1,10 +1,12 @@
-from episode.episode import episodes
-from utils.utils import get_csv_as_matrix
+from apriori import apriori
+from episode import episode
 
 
 def main():
-    matrix = get_csv_as_matrix()
-    episodes(matrix)
+    print("Episode")
+    episode.run()
+    print("Apriori")
+    apriori.run()
 
 
 if __name__ == '__main__':

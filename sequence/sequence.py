@@ -1,4 +1,5 @@
 import csv
+from tkinter import filedialog
 
 
 def load_sequences_from_csv(file_path):
@@ -56,11 +57,14 @@ def apriori_sequence_mining(sequences, minsup):
 
 
 def run():
-    file_path = '../sample_two.csv'
-    minsup = 0.1
+    file_path = filedialog.askopenfilename()
+    minsup = 0.5
     sequences = load_sequences_from_csv(file_path)
     frequent_patterns = apriori_sequence_mining(sequences, minsup)
     print("Frequent sequential patterns:", frequent_patterns)
+    with open('frequent_patterns.txt', 'w') as file:
+        writer = csv.writer(file)
+        writer.writerows(frequent_patterns)
 
 
 if __name__ == '__main__':

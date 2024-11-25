@@ -1,0 +1,12 @@
+Frequent item sets:
+{'Amériques'}
+{'MENA'}
+{'Excelente'}
+{'Regular'}
+{'Buena'}
+{'Asie-Pacifique'}
+{'Afrique'}
+{'UE Balkans'}
+{'UE Balkans', 'Excelente'}
+{'Afrique', 'Buena'}
+{'UE Balkans', 'Buena'}

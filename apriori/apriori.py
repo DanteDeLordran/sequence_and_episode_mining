@@ -1,5 +1,7 @@
 import csv
 from itertools import combinations
+from tkinter import filedialog
+
 
 def load_transactions_from_csv(file_path):
     transactions = []
@@ -9,8 +11,9 @@ def load_transactions_from_csv(file_path):
             transactions.append(set(row))
     return transactions
 
+
 def apriori(transactions, minsup):
-    def get_frequent_itemsets(itemsets, minsup, transaction_count):
+    def get_frequent_item_sets(itemsets, minsup, transaction_count):
         itemset_counts = {}
         for transaction in transactions:
             for itemset in itemsets:
@@ -35,7 +38,7 @@ def apriori(transactions, minsup):
     k = 1
 
     while True:
-        current_frequent_itemsets, itemset_counts = get_frequent_itemsets(itemsets, minsup, transaction_count)
+        current_frequent_itemsets, itemset_counts = get_frequent_item_sets(itemsets, minsup, transaction_count)
         if not current_frequent_itemsets:
             break
 
@@ -48,13 +51,20 @@ def apriori(transactions, minsup):
 
 
 def run():
-    file_path = '../sample_three.csv'
-    minsup = 0.5
+    file_path = filedialog.askopenfilename()
+    minsup = 0.1
 
     transactions = load_transactions_from_csv(file_path)
 
-    frequent_itemsets = apriori(transactions, minsup)
-    print("Frequent itemsets:", frequent_itemsets)
+    frequent_item_sets = apriori(transactions, minsup)
+
+    # Save results to a text file
+    with open('frequent_item_sets.txt', 'w') as file:
+        file.write("Frequent item sets:\n")
+        for itemset in frequent_item_sets:
+            file.write(f"{set(itemset)}\n")
+
+    print("Frequent item sets have been saved to 'frequent_item_sets.txt'.")
 
 
 if __name__ == '__main__':
