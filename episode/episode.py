@@ -62,7 +62,7 @@ def apriori_sequence_mining(sequences, minsup):
 def run():
     """Run the episode mining process."""
     file_path = filedialog.askopenfilename()
-    minsup = 0.5
+    minsup = 0.8
     sequences = load_episodes_from_csv(file_path)
     frequent_patterns = apriori_sequence_mining(sequences, minsup)
 
